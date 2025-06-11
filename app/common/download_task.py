@@ -520,10 +520,10 @@ class DownloadTask(QThread):
                     speedIncreasePerThread = (info.speed - formerInfo.speed) / (taskNum - formerTaskNum)                    
                     threadUtilization = speedIncreasePerThread / maxSpeedPerConnect
                     timeCompensation = TIME_WEIGHT_FACTOR / info.time
-                    logger.debug(f'speed:{getReadableSize(info.speed)}/s {getReadableSize(info.speed - formerInfo.speed)}/s / {taskNum - formerTaskNum} / maxSpeedPerThread {getReadableSize(maxSpeedPerConnect)}/s = threadUtilization:{threadUtilization:.2f}, timeCompensation:{timeCompensation:.2f}, time:{info.time:.2f}s')
-                    adjustedEfficiencyThreshold =  BASE_UTILIZATION_THRESHOLD + timeCompensation
-                    
-                    if threadUtilization >= adjustedEfficiencyThreshold and self.taskNum < 256:
+                    #adjustedEfficiencyThreshold =  BASE_UTILIZATION_THRESHOLD + timeCompensation
+                    square = (threadUtilization - BASE_UTILIZATION_THRESHOLD) ** 2
+                    logger.debug(f'Square:{square:.2f}, speed:{getReadableSize(info.speed)}/s {getReadableSize(info.speed - formerInfo.speed)}/s / {taskNum - formerTaskNum} / maxSpeedPerThread {getReadableSize(maxSpeedPerConnect)}/s = threadUtilization:{threadUtilization:.2f}, timeCompensation:{timeCompensation:.2f}, time:{info.time:.2f}s')
+                    if square >= timeCompensation and self.taskNum < 256:
                         logger.debug(f'自动提速增加新线程  {threadUtilization}')
                         self.__reassignWorker()
             # Wait before next update
